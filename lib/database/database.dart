@@ -1,7 +1,9 @@
+import 'package:crono_cube/database/solve_dao.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DataBaseHelper {
+  static const int _dbVersion = 1;
   static Database? _database;
 
   static Future<Database> get instance async {
@@ -17,10 +19,16 @@ class DataBaseHelper {
     String path = join(databasesPath, 'cronocuber.db');
 
 // open the database
-    _database = await openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-      // When creating the db, create the table
-      //await db.execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)');
-    });
+    _database = await openDatabase(
+      path,
+      version: _dbVersion,
+      onCreate: (Database db, int version) async {
+        await db.execute(SolveDao.createTableSql);
+      },
+      singleInstance: true,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.delete(SolveDao.tableName);
+      },
+    );
   }
 }
