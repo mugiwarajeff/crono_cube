@@ -4,4 +4,6 @@ abstract class ScrumbleGenerator {
   String selectScrumbeForCubeType(CubeType cubeType);
 
   String generateScrumble(List<String> possibleMoves, int quantMoves);
+
+  String generateSquareOneScrumbe();
 }

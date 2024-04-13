@@ -16,4 +16,28 @@ void main() {
 
     expect(scrumbleItens.length, equals(matchLenght));
   });
+
+  test("Should generate a Square One Scrumble with 10 steps", () {
+    int matchLenght = 10;
+    String scrumble =
+        scrumbleGenerator.selectScrumbeForCubeType(CubeType.squareone);
+
+    print(scrumble);
+
+    List<String> scrumbleItens = scrumble.split("/");
+
+    expect(scrumbleItens.length, equals(matchLenght));
+  });
+
+  test("Should generate a Rubick Clock Scrumble with 15 steps", () {
+    int matchLenght = 15;
+    String scrumble =
+        scrumbleGenerator.selectScrumbeForCubeType(CubeType.rubicclock);
+
+    print(scrumble);
+
+    List<String> scrumbleItens = scrumble.split(" ");
+
+    expect(scrumbleItens.length, equals(matchLenght));
+  });
 }
