@@ -10,9 +10,13 @@ class LoadedCubeTimerState extends CubeTimerState {
   int time;
   bool pressed;
   TimerState timerState;
+  final String scrumble;
 
   LoadedCubeTimerState(
-      {required this.time, required this.timerState, required this.pressed});
+      {required this.time,
+      required this.timerState,
+      required this.pressed,
+      required this.scrumble});
 }
 
 class ErrorCubeTimerState extends CubeTimerState {

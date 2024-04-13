@@ -10,6 +10,7 @@ class SolveDao {
   static const String _scramble = "scramble";
   static const String _comment = "comment";
   static const String _cubeType = "cube_type";
+  static const String _cubeTag = "cube_tag";
 
   static const String createTableSql = 'CREATE TABLE $tableName('
       '$_id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -17,6 +18,7 @@ class SolveDao {
       '$_solveDate INTEGER,'
       '$_scramble TEXT,'
       '$_comment TEXT,'
+      '$_cubeTag TEXT,'
       '$_cubeType TEXT )';
 
   Future<int> insertSolve(Solve solve) async {

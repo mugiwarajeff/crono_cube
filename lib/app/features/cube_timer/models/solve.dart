@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 
 class Solve {
@@ -9,6 +10,7 @@ class Solve {
   final String scramble;
   final String comment;
   final CubeType cubeType;
+  final CubeTag cubeTag;
 
   Solve(
       {required this.id,
@@ -16,6 +18,7 @@ class Solve {
       required this.time,
       required this.solveDate,
       required this.scramble,
+      required this.cubeTag,
       required this.cubeType});
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +27,7 @@ class Solve {
         "solve_date": solveDate.millisecondsSinceEpoch,
         "scramble": scramble,
         "cube_type": cubeType.name,
+        "cube_tag": cubeTag.name,
         "comment": comment
       };
 
@@ -32,6 +36,7 @@ class Solve {
         time = json["time"],
         solveDate = DateTime.fromMillisecondsSinceEpoch(json["solve_date"]),
         scramble = json["scramble"],
+        cubeTag = CubeTag.values.byName(json["cube_tag"]),
         cubeType = CubeType.values.byName(json["cube_type"]),
         comment = json["comment"];
 }

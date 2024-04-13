@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/timer_states.dart';
+import 'package:crono_cube/app/features/cube_timer/services/impl/scrumbe_generator_impl.dart';
+import 'package:crono_cube/app/features/cube_timer/services/interfaces/scrumble_generator.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_state.dart';
 
 class CubeTimerBloc extends Cubit<CubeTimerState> {
   int _time = 0;
   int _holdingTime = 0;
+  String _scrumble = "";
   final int _awaitHoldinTime = 1000;
   bool _pressed = false;
   TimerState _timerState = TimerState.initial;
@@ -14,8 +18,17 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   DateTime initialTime = DateTime.now();
 
   CubeTimerBloc() : super(InitialCubeTimerState()) {
+    _loadTimer();
+  }
+
+  void _loadTimer() {
+    ScrumbleGenerator scrumbleGenerator = ScrumbleGeneratorImpl();
+    _scrumble = scrumbleGenerator.selectScrumbeForCubeType(CubeType.cube3x3x3);
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 
   void prepareToGo() {
@@ -23,20 +36,29 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     _time = 0;
     _updateHoldingTime();
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 
   void _readyToGo() {
     _timerState = TimerState.ready;
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 
   void resetCronometer() {
     _timerState = TimerState.initial;
     _holdingTime = 0;
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 
   Future<void> _updateHoldingTime() async {
@@ -57,14 +79,20 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     _timerState = TimerState.running;
     initialTime = DateTime.now();
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
     updateTimer();
   }
 
   void setPressed(bool pressed) {
     _pressed = pressed;
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 
   Future<void> updateTimer() async {
@@ -74,7 +102,10 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
       _time = nowTime.difference(initialTime).inMilliseconds;
 
       emit(LoadedCubeTimerState(
-          time: _time, timerState: _timerState, pressed: _pressed));
+          time: _time,
+          timerState: _timerState,
+          pressed: _pressed,
+          scrumble: _scrumble));
       updateTimer();
     }
   }
@@ -83,6 +114,9 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     _timerState = TimerState.initial;
     _holdingTime = 0;
     emit(LoadedCubeTimerState(
-        time: _time, timerState: _timerState, pressed: _pressed));
+        time: _time,
+        timerState: _timerState,
+        pressed: _pressed,
+        scrumble: _scrumble));
   }
 }
