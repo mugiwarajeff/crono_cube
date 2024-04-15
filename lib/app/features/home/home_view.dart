@@ -12,7 +12,7 @@ class HomeView extends StatelessWidget {
     void showConfigurationsDialog() {
       showDialog(
         context: context,
-        builder: (context) => const ConfigurationsDialog(),
+        builder: (context) => ConfigurationsDialog(),
       );
     }
 

@@ -7,9 +7,11 @@ class InitialConfigurationsState extends ConfigurationsState {}
 class LoadingConfigurationsState extends ConfigurationsState {}
 
 class LoadedConfigurationsState extends ConfigurationsState {
+  Configurations tempConfigurations;
   Configurations configurations;
 
-  LoadedConfigurationsState({required this.configurations});
+  LoadedConfigurationsState(
+      {required this.configurations, required this.tempConfigurations});
 }
 
 class ErrorConfigurationsState extends ConfigurationsState {

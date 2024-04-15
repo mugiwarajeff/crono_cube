@@ -2,13 +2,13 @@ import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 
 class Configurations {
-  final bool darkTheme;
-  final bool inspect;
-  final bool pressToRun;
-  final int timeInspect;
+  bool darkTheme;
+  bool inspect;
+  bool pressToRun;
+  int timeInspect;
 
-  final CubeTag cubeTag;
-  final CubeType cubeType;
+  CubeTag cubeTag;
+  CubeType cubeType;
 
   Configurations(
       {required this.cubeTag,
@@ -34,4 +34,20 @@ class Configurations {
         "press_to_run": pressToRun ? 1 : 0,
         "time_inspect": timeInspect
       };
+
+  Configurations clone() => Configurations(
+      cubeTag: cubeTag,
+      cubeType: cubeType,
+      darkTheme: darkTheme,
+      inspect: inspect,
+      pressToRun: pressToRun,
+      timeInspect: timeInspect);
+
+  Configurations.empty()
+      : cubeTag = CubeTag.normal,
+        cubeType = CubeType.cube3x3x3,
+        darkTheme = false,
+        inspect = false,
+        pressToRun = false,
+        timeInspect = 15;
 }
