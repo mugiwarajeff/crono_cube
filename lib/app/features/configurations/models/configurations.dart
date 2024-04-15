@@ -1,3 +1,4 @@
+import 'package:crono_cube/app/features/configurations/models/value_object/time_inspect.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 
@@ -5,7 +6,7 @@ class Configurations {
   bool darkTheme;
   bool inspect;
   bool pressToRun;
-  int timeInspect;
+  TimeInspect timeInspect;
 
   CubeTag cubeTag;
   CubeType cubeType;
@@ -24,7 +25,7 @@ class Configurations {
         darkTheme = json["dark_theme"] == 1 ? true : false,
         inspect = json["inspect"] == 1 ? true : false,
         pressToRun = json["press_to_run"] == 1 ? true : false,
-        timeInspect = json["time_inspect"];
+        timeInspect = TimeInspect(value: json["time_inspect"]);
 
   Map<String, dynamic> toJson() => {
         "cube_tag": cubeTag.name,
@@ -32,7 +33,7 @@ class Configurations {
         "dark_theme": darkTheme ? 1 : 0,
         "inspect": inspect ? 1 : 0,
         "press_to_run": pressToRun ? 1 : 0,
-        "time_inspect": timeInspect
+        "time_inspect": timeInspect.value
       };
 
   Configurations clone() => Configurations(
@@ -49,5 +50,5 @@ class Configurations {
         darkTheme = false,
         inspect = false,
         pressToRun = false,
-        timeInspect = 15;
+        timeInspect = TimeInspect(value: 15);
 }

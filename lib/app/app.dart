@@ -1,5 +1,5 @@
 import 'package:crono_cube/app/features/home/home_view.dart';
-import 'package:crono_cube/app/shared/theme.dart';
+import 'package:crono_cube/app/shared/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {

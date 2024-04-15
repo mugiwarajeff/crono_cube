@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(BlocProvider(
+    lazy: false,
     create: (context) => ConfigurationsBloc(),
     child: const App(),
   ));

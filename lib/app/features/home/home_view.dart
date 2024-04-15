@@ -1,6 +1,8 @@
+import 'package:crono_cube/app/features/configurations/bloc/configurations_bloc.dart';
 import 'package:crono_cube/app/features/configurations/configurations_dialog.dart';
 import 'package:crono_cube/app/features/cube_timer/cube_timer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -11,9 +13,15 @@ class HomeView extends StatelessWidget {
 
     void showConfigurationsDialog() {
       showDialog(
-        context: context,
-        builder: (context) => ConfigurationsDialog(),
-      );
+          context: context,
+          builder: (context) {
+            ConfigurationsBloc configurationsBloc =
+                BlocProvider.of<ConfigurationsBloc>(context);
+
+            return ConfigurationsDialog(
+              configurationsBloc: configurationsBloc,
+            );
+          });
     }
 
     return Scaffold(
