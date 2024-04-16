@@ -1,11 +1,9 @@
-import 'dart:ffi';
-
 import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 
 class Solve {
-  final Int id;
-  final double time;
+  int id;
+  final int time;
   final DateTime solveDate;
   final String scramble;
   final String comment;
@@ -22,7 +20,6 @@ class Solve {
       required this.cubeType});
 
   Map<String, dynamic> toJson() => {
-        "id": id,
         "time": time,
         "solve_date": solveDate.millisecondsSinceEpoch,
         "scramble": scramble,

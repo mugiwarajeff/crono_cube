@@ -1,3 +1,5 @@
+import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
+import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/models/solve.dart';
 import 'package:crono_cube/database/database.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,7 +16,7 @@ class SolveDao {
 
   static const String createTableSql = 'CREATE TABLE $tableName('
       '$_id INTEGER PRIMARY KEY AUTOINCREMENT,'
-      '$_time REAL,'
+      '$_time INTEGER,'
       '$_solveDate INTEGER,'
       '$_scramble TEXT,'
       '$_comment TEXT,'
@@ -38,5 +40,27 @@ class SolveDao {
         queryResult.map((solveJson) => Solve.fromJson(solveJson)).toList();
 
     return solves;
+  }
+
+  Future<List<Solve>> getSolvesByCubeType(
+      CubeType cubeType, CubeTag cubeTag) async {
+    Database db = await DataBaseHelper.instance;
+
+    List<Map<String, dynamic>> queryResult = await db.query(tableName,
+        where:
+            "$_cubeType = '${cubeType.name}' and $_cubeTag = '${cubeTag.name}'");
+
+    List<Solve> solves =
+        queryResult.map((solveJson) => Solve.fromJson(solveJson)).toList();
+
+    return solves;
+  }
+
+  Future<int> deleteSolve(Solve solve) async {
+    Database db = await DataBaseHelper.instance;
+
+    int result = await db.delete(tableName, where: "$_id = '${solve.id}'");
+
+    return result;
   }
 }

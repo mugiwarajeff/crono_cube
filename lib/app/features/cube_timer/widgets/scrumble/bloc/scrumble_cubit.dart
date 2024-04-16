@@ -7,6 +7,8 @@ class ScrumbleCubit extends Cubit<ScrumbleState> {
   String? _scrumble;
   final ScrumbleGenerator scrumbleGenerator;
 
+  String get scrumble => _scrumble ?? "";
+
   ScrumbleCubit({required this.scrumbleGenerator})
       : super(InitialScrumbleState());
 

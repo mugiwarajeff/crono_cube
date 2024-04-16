@@ -1,6 +1,7 @@
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumble_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumble_state.dart';
+import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/scrumble_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +32,10 @@ class ScrumbleViewer extends StatelessWidget {
         } else if (state is LoadedScrumbleState) {
           return InkWell(
             onTap: () {
-              showDialog(context: context, builder: (context) => Container());
+              showDialog(
+                  context: context,
+                  builder: (context) =>
+                      ScrumbleDetails(scrumble: state.scrumble));
             },
             child: Card(
               margin: const EdgeInsets.all(8.0),
