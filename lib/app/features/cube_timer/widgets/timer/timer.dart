@@ -1,6 +1,7 @@
 import 'package:crono_cube/app/features/cube_timer/enum/timer_states.dart';
 import 'package:crono_cube/app/features/cube_timer/utils/timer_utils.dart'
     as utils;
+import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumble_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_bloc.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_state.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class Timer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ScrumbleCubit scrumbleCubit = BlocProvider.of<ScrumbleCubit>(context);
     final Size size = MediaQuery.of(context).size;
     const double iconSize = 74;
     const double pressedIconSize = 70;
@@ -18,7 +20,7 @@ class Timer extends StatelessWidget {
     const double boxRadius = 100;
     const double strokeWidth = 5;
     const double timerTextSize = 80;
-    const double scrumbleTextSize = 18;
+
     const double averageTextSize = 16;
 
     final CubeTimerBloc cubeTimerBloc = CubeTimerBloc();
@@ -35,14 +37,6 @@ class Timer extends StatelessWidget {
             height: size.height * 0.5,
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    state.scrumble,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: scrumbleTextSize),
-                  ),
-                ),
                 Text(
                   utils.formatCronometerText(state.time),
                   style: TextStyle(
@@ -73,6 +67,7 @@ class Timer extends StatelessWidget {
                     onTap: () {
                       if (state.timerState == TimerState.running) {
                         cubeTimerBloc.stopTimer();
+                        scrumbleCubit.resetScramble();
                       }
                     },
                     child: Row(
@@ -108,8 +103,8 @@ class Timer extends StatelessWidget {
                               border: Border.all(
                                   color: Colors.black, width: strokeWidth),
                               color: Colors.blue,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(boxRadius))),
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(boxRadius))),
                           child: Icon(
                             Icons.back_hand_outlined,
                             size: state.pressed ? pressedIconSize : iconSize,
