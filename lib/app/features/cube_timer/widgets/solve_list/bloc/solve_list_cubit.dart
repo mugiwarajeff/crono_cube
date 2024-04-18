@@ -36,6 +36,22 @@ class SolveListCubit extends Cubit<SolveListState> {
     }
   }
 
+  Future<void> updateSolve(Solve solve) async {
+    int updatedLines = await _solveDao.updateSolve(solve);
+
+    if (updatedLines > 0) {
+      Solve getSolve = _solves.where((element) => element.id == solve.id).first;
+
+      int index = _solves.indexOf(getSolve);
+      _solves.remove(getSolve);
+      _solves.insert(index, solve);
+
+      emit(LoadedSolveListState(solves: _solves));
+    } else {
+      emit(ErrorSolveListState(error: "Unknown"));
+    }
+  }
+
   Future<void> removeSolve(Solve solve) async {
     int removedLines = await _solveDao.deleteSolve(solve);
 

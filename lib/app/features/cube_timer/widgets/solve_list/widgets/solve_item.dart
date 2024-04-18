@@ -1,5 +1,9 @@
 import 'package:crono_cube/app/features/cube_timer/models/solve.dart';
+import 'package:crono_cube/app/features/cube_timer/utils/timer_utils.dart';
+import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/bloc/solve_list_cubit.dart';
+import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/widgets/solve_item_info_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SolveItem extends StatelessWidget {
   final int index;
@@ -18,10 +22,7 @@ class SolveItem extends StatelessWidget {
     const double timeSize = 16;
     const double scrumbleSize = 10;
 
-    String formatMilisegunds(int miliseconds) {
-      double seconds = (miliseconds / 1000);
-      return "${seconds < 10 ? "0" : ""}${seconds.toStringAsFixed(2)}";
-    }
+    SolveListCubit solveListCubit = BlocProvider.of<SolveListCubit>(context);
 
     String limitScramle(String scramble) {
       if (scramble.length >= 55) {
@@ -31,26 +32,64 @@ class SolveItem extends StatelessWidget {
       return scramble;
     }
 
-    return Card(
-      child: ListTile(
-        leading: Text(
-          index.toString(),
-          style: const TextStyle(fontSize: indexSize),
+    void showSolveInfo() {
+      showDialog(
+        context: context,
+        builder: (context) => SolveItemInfoDialog(
+          solve: solve,
+          index: index,
         ),
-        title: Text(
-          formatMilisegunds(solve.time),
-          style: const TextStyle(fontSize: timeSize),
+      );
+    }
+
+    return InkWell(
+      onTap: showSolveInfo,
+      child: Card(
+        child: ListTile(
+          leading: Text(
+            index.toString(),
+            style: const TextStyle(fontSize: indexSize),
+          ),
+          title: Text(
+            solve.dnf ? "DNF" : formatMilisegunds(solve.time),
+            style: const TextStyle(fontSize: timeSize),
+          ),
+          subtitle: Text(
+            limitScramle(solve.scramble),
+            style: const TextStyle(fontSize: scrumbleSize),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                  onPressed: () {
+                    solve.dnf = !solve.dnf;
+                    solveListCubit.updateSolve(solve);
+                  },
+                  icon: Text(
+                    "DNF",
+                    style: TextStyle(
+                        color: solve.dnf ? Colors.orange : Colors.grey),
+                  )),
+              IconButton(
+                  onPressed: () {
+                    solve.plusTwo = !solve.plusTwo;
+                    solveListCubit.updateSolve(solve);
+                  },
+                  icon: Text(
+                    "+2",
+                    style: TextStyle(
+                        color: solve.plusTwo ? Colors.orange : Colors.grey),
+                  )),
+              IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  )),
+            ],
+          ),
         ),
-        subtitle: Text(
-          limitScramle(solve.scramble),
-          style: const TextStyle(fontSize: scrumbleSize),
-        ),
-        trailing: IconButton(
-            onPressed: onDelete,
-            icon: const Icon(
-              Icons.delete,
-              color: Colors.red,
-            )),
       ),
     );
   }

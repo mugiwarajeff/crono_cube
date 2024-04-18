@@ -45,8 +45,8 @@ class ScrumbleGeneratorImpl implements ScrumbleGenerator {
             possibleMoves.elementAt(random.nextInt(possibleMoves.length));
 
         if (scrumble.isEmpty ||
-            move != scrumble.last ||
-            move.split("")[0] != scrumble.last.split("")[0]) {
+            (move != scrumble.last &&
+                move.split("")[0] != scrumble.last.split("")[0])) {
           scrumble.add(move);
           break;
         }

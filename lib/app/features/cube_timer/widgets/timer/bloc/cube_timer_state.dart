@@ -8,14 +8,20 @@ class LoadingCubeTimerState extends CubeTimerState {}
 
 class LoadedCubeTimerState extends CubeTimerState {
   int time;
+  int timeCountDown;
   bool pressed;
+  bool plusTwo;
+  bool dnf;
   TimerState timerState;
   final String scrumble;
 
   LoadedCubeTimerState(
       {required this.time,
+      required this.timeCountDown,
       required this.timerState,
       required this.pressed,
+      required this.plusTwo,
+      required this.dnf,
       required this.scrumble});
 }
 

@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
 
-ThemeData themeData =
-    ThemeData(appBarTheme: const AppBarTheme(centerTitle: true));
+ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    appBarTheme: const AppBarTheme(centerTitle: true));
+
+ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    appBarTheme: const AppBarTheme(centerTitle: true));

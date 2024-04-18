@@ -13,6 +13,8 @@ class SolveDao {
   static const String _comment = "comment";
   static const String _cubeType = "cube_type";
   static const String _cubeTag = "cube_tag";
+  static const String _dnf = "dnf";
+  static const String _plusTwo = "plus_two";
 
   static const String createTableSql = 'CREATE TABLE $tableName('
       '$_id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -21,6 +23,8 @@ class SolveDao {
       '$_scramble TEXT,'
       '$_comment TEXT,'
       '$_cubeTag TEXT,'
+      '$_dnf INTEGER,'
+      '$_plusTwo INTEGER,'
       '$_cubeType TEXT )';
 
   Future<int> insertSolve(Solve solve) async {
@@ -60,6 +64,15 @@ class SolveDao {
     Database db = await DataBaseHelper.instance;
 
     int result = await db.delete(tableName, where: "$_id = '${solve.id}'");
+
+    return result;
+  }
+
+  Future<int> updateSolve(Solve solve) async {
+    Database db = await DataBaseHelper.instance;
+
+    int result = await db.update(tableName, solve.toJson(),
+        where: "$_id = '${solve.id}'");
 
     return result;
   }

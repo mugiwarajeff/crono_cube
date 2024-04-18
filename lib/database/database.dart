@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DataBaseHelper {
-  static const int _dbVersion = 3;
+  static const int _dbVersion = 4;
   static Database? _database;
 
   static Future<Database> get instance async {
@@ -17,7 +17,7 @@ class DataBaseHelper {
 
   static Future<void> _initDatabase() async {
     String databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'cronocuber2.db');
+    String path = join(databasesPath, 'cronocuber3.db');
 
 // open the database
     _database = await openDatabase(

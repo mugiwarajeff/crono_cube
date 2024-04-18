@@ -1,10 +1,12 @@
+import 'package:crono_cube/app/features/configurations/bloc/configurations_bloc.dart';
+
 import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/timer_states.dart';
 import 'package:crono_cube/app/features/cube_timer/models/solve.dart';
 import 'package:crono_cube/app/features/cube_timer/utils/timer_utils.dart'
     as utils;
-import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumble_cubit.dart';
+
 import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/bloc/solve_list_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/bloc/solve_list_state.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_bloc.dart';
@@ -22,6 +24,7 @@ class Timer extends StatelessWidget {
   Widget build(BuildContext context) {
     final SolveListCubit solveListCubit =
         BlocProvider.of<SolveListCubit>(context);
+    final ConfigurationsBloc configurationsBloc = BlocProvider.of(context);
 
     final Size size = MediaQuery.of(context).size;
     const double iconSize = 74;
@@ -33,7 +36,8 @@ class Timer extends StatelessWidget {
 
     const double averageTextSize = 16;
 
-    final CubeTimerBloc cubeTimerBloc = CubeTimerBloc();
+    final CubeTimerBloc cubeTimerBloc = CubeTimerBloc(
+        inspectTime: configurationsBloc.configurations.timeInspect.value);
 
     return BlocBuilder<CubeTimerBloc, CubeTimerState>(
       bloc: cubeTimerBloc,
@@ -48,10 +52,16 @@ class Timer extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  utils.formatCronometerText(state.time),
+                  state.dnf
+                      ? "DNF"
+                      : state.plusTwo
+                          ? "+2"
+                          : state.timerState == TimerState.inspecting
+                              ? state.timeCountDown.toString()
+                              : utils.formatCronometerText(state.time),
                   style: TextStyle(
                       fontSize: timerTextSize,
-                      color: utils.selectTextColor(state.timerState)),
+                      color: utils.selectTextColor(state.timerState, context)),
                 ),
                 BlocBuilder<SolveListCubit, SolveListState>(
                   bloc: solveListCubit,
@@ -108,34 +118,36 @@ class Timer extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 40, right: 40, top: 16),
                   child: GestureDetector(
                     onLongPressStart: (details) {
-                      if (state.timerState == TimerState.initial) {
+                      if (configurationsBloc.configurations.pressToRun &&
+                          state.timerState == TimerState.initial) {
                         cubeTimerBloc.prepareToGo();
                         cubeTimerBloc.setPressed(true);
                       }
                     },
                     onLongPressEnd: (details) {
                       if (state.timerState == TimerState.ready) {
-                        cubeTimerBloc.startTimer();
+                        if (configurationsBloc.configurations.inspect) {
+                          cubeTimerBloc.startCountDown(context);
+                        } else {
+                          cubeTimerBloc.startTimer();
+                        }
                       } else {
                         cubeTimerBloc.resetCronometer();
                       }
                       cubeTimerBloc.setPressed(false);
                     },
                     onTap: () {
-                      if (state.timerState == TimerState.running) {
-                        ScrumbleCubit scrumbleCubit =
-                            BlocProvider.of<ScrumbleCubit>(context);
-                        cubeTimerBloc.stopTimer();
-
-                        solveListCubit.addNewSolve(Solve(
-                            id: 0,
-                            comment: "",
-                            time: state.time,
-                            solveDate: DateTime.now(),
-                            scramble: scrumbleCubit.scrumble,
-                            cubeTag: cubeTag,
-                            cubeType: cubeType));
-                        scrumbleCubit.resetScramble();
+                      if (!configurationsBloc.configurations.pressToRun &&
+                          state.timerState == TimerState.initial) {
+                        if (configurationsBloc.configurations.inspect) {
+                          cubeTimerBloc.startCountDown(context);
+                        } else {
+                          cubeTimerBloc.startTimer();
+                        }
+                      } else if (state.timerState == TimerState.inspecting) {
+                        cubeTimerBloc.startTimer();
+                      } else if (state.timerState == TimerState.running) {
+                        cubeTimerBloc.stopTimer(context);
                       }
                     },
                     child: Row(
@@ -151,7 +163,7 @@ class Timer extends StatelessWidget {
                           decoration: BoxDecoration(
                               border: Border.all(
                                   color: Colors.black, width: strokeWidth),
-                              color: Colors.blue,
+                              color: Theme.of(context).colorScheme.primary,
                               borderRadius: const BorderRadius.all(
                                   Radius.circular(boxRadius))),
                           child: Icon(
@@ -170,7 +182,7 @@ class Timer extends StatelessWidget {
                           decoration: BoxDecoration(
                               border: Border.all(
                                   color: Colors.black, width: strokeWidth),
-                              color: Colors.blue,
+                              color: Theme.of(context).colorScheme.primary,
                               borderRadius: const BorderRadius.all(
                                   Radius.circular(boxRadius))),
                           child: Icon(

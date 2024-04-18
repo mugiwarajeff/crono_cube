@@ -38,9 +38,9 @@ class CubeTimer extends StatelessWidget {
               }
             },
           ),
-          const Divider(
+          Divider(
             thickness: dividerSize,
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
           ),
           BlocBuilder<ConfigurationsBloc, ConfigurationsState>(
             builder: (context, state) {
