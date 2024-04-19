@@ -19,6 +19,10 @@ Color selectTextColor(TimerState timerState, BuildContext context) {
       return color;
     case TimerState.inspecting:
       return color;
+    case TimerState.plusTwo:
+      return color;
+    case TimerState.dnf:
+      return color;
   }
 }
 

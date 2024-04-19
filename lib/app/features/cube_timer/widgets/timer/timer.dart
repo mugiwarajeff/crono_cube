@@ -52,9 +52,9 @@ class Timer extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  state.dnf
+                  state.timerState == TimerState.dnf
                       ? "DNF"
-                      : state.plusTwo
+                      : state.timerState == TimerState.plusTwo
                           ? "+2"
                           : state.timerState == TimerState.inspecting
                               ? state.timeCountDown.toString()
@@ -119,7 +119,8 @@ class Timer extends StatelessWidget {
                   child: GestureDetector(
                     onLongPressStart: (details) {
                       if (configurationsBloc.configurations.pressToRun &&
-                          state.timerState == TimerState.initial) {
+                          (state.timerState == TimerState.initial ||
+                              state.timerState == TimerState.dnf)) {
                         cubeTimerBloc.prepareToGo();
                         cubeTimerBloc.setPressed(true);
                       }
@@ -138,13 +139,15 @@ class Timer extends StatelessWidget {
                     },
                     onTap: () {
                       if (!configurationsBloc.configurations.pressToRun &&
-                          state.timerState == TimerState.initial) {
+                          (state.timerState == TimerState.initial ||
+                              state.timerState == TimerState.dnf)) {
                         if (configurationsBloc.configurations.inspect) {
                           cubeTimerBloc.startCountDown(context);
                         } else {
                           cubeTimerBloc.startTimer();
                         }
-                      } else if (state.timerState == TimerState.inspecting) {
+                      } else if (state.timerState == TimerState.inspecting ||
+                          state.timerState == TimerState.plusTwo) {
                         cubeTimerBloc.startTimer();
                       } else if (state.timerState == TimerState.running) {
                         cubeTimerBloc.stopTimer(context);

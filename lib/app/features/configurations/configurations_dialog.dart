@@ -37,6 +37,12 @@ class _ConfigurationsDialogState extends State<ConfigurationsDialog> {
     const String cubeTypelabel = "Tipo de Cubo";
     const String cubeTagLabel = "Tag do Cubo";
     const String inspectTimeLabel = "Tempo de Inspeção";
+
+    final Color erroColor = Theme.of(context).colorScheme.error;
+    final Color onErrorColor = Theme.of(context).colorScheme.onError;
+
+    final Color successColor = Theme.of(context).colorScheme.secondary;
+    final Color onSuccessColor = Theme.of(context).colorScheme.onSecondary;
     return Dialog(
       child: SizedBox(
         height: widget.configurations.inspect
@@ -49,8 +55,11 @@ class _ConfigurationsDialogState extends State<ConfigurationsDialog> {
               listener: (context, state) {
                 if (state is SuccessOnUpdateState) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.green,
+                    content: Text(
+                      state.message,
+                      style: TextStyle(color: onSuccessColor),
+                    ),
+                    backgroundColor: successColor,
                   ));
 
                   Navigator.of(context).pop();
@@ -58,8 +67,11 @@ class _ConfigurationsDialogState extends State<ConfigurationsDialog> {
 
                 if (state is ErrorConfigurationsState) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: Colors.red,
+                    content: Text(
+                      state.error,
+                      style: TextStyle(color: onErrorColor),
+                    ),
+                    backgroundColor: erroColor,
                   ));
                 }
               },

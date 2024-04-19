@@ -80,8 +80,9 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   }
 
   Future<void> _updateCountDown(BuildContext context) async {
-    if (_plusTwo) {
+    if (_timerState == TimerState.plusTwo) {
       _dnf = true;
+      _timerState = TimerState.dnf;
       emit(LoadedCubeTimerState(
           time: _time,
           timeCountDown: _countDownTime,
@@ -94,6 +95,9 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
       stopTimer(context);
     } else if (_countDownTime == 0) {
       _plusTwo = true;
+      _countDownTime = 15;
+      _timerState = TimerState.plusTwo;
+
       emit(LoadedCubeTimerState(
           time: _time,
           timeCountDown: _countDownTime,
@@ -136,8 +140,9 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   }
 
   void resetCronometer() {
-    _timerState = TimerState.initial;
+    _timerState = _dnf ? TimerState.dnf : TimerState.initial;
     _time = 0;
+    _holdingTime = 0;
     _countDownTime = inspectTime;
     _dnf = false;
     _plusTwo = false;
@@ -168,6 +173,7 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   void startTimer() {
     _timerState = TimerState.running;
     _time = 0;
+    // _countDownTime = 15;
     initialTime = DateTime.now();
     emit(LoadedCubeTimerState(
         time: _time,
@@ -217,8 +223,6 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
 
     ConfigurationsBloc configurationsCubit =
         BlocProvider.of<ConfigurationsBloc>(context);
-    _timerState = TimerState.initial;
-    _holdingTime = 0;
 
     emit(LoadedCubeTimerState(
         time: _time,
@@ -237,9 +241,10 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         scramble: scrumbleCubit.scrumble,
         cubeTag: configurationsCubit.configurations.cubeTag,
         cubeType: configurationsCubit.configurations.cubeType,
-        dnf: false,
-        plusTwo: false));
+        dnf: _dnf,
+        plusTwo: _plusTwo));
 
+    resetCronometer();
     scrumbleCubit.resetScramble();
   }
 }

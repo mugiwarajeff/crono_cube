@@ -22,6 +22,9 @@ class SolveItem extends StatelessWidget {
     const double timeSize = 16;
     const double scrumbleSize = 10;
 
+    final Color secondaryColor = Theme.of(context).colorScheme.secondary;
+    final Color errorColor = Theme.of(context).colorScheme.error;
+
     SolveListCubit solveListCubit = BlocProvider.of<SolveListCubit>(context);
 
     String limitScramle(String scramble) {
@@ -69,7 +72,7 @@ class SolveItem extends StatelessWidget {
                   icon: Text(
                     "DNF",
                     style: TextStyle(
-                        color: solve.dnf ? Colors.orange : Colors.grey),
+                        color: solve.dnf ? secondaryColor : Colors.grey),
                   )),
               IconButton(
                   onPressed: () {
@@ -79,14 +82,11 @@ class SolveItem extends StatelessWidget {
                   icon: Text(
                     "+2",
                     style: TextStyle(
-                        color: solve.plusTwo ? Colors.orange : Colors.grey),
+                        color: solve.plusTwo ? secondaryColor : Colors.grey),
                   )),
               IconButton(
                   onPressed: onDelete,
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  )),
+                  icon: Icon(Icons.delete, color: errorColor)),
             ],
           ),
         ),

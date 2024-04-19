@@ -1,1 +1,1 @@
-enum TimerState { initial, preparing, ready, inspecting, running }
+enum TimerState { initial, preparing, ready, inspecting, plusTwo, dnf, running }
