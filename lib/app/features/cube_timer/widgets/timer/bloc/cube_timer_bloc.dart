@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
-import 'package:crono_cube/app/features/configurations/bloc/configurations_bloc.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/timer_states.dart';
 import 'package:crono_cube/app/features/cube_timer/models/solve.dart';
@@ -10,14 +8,19 @@ import 'package:crono_cube/app/features/cube_timer/services/interfaces/scrumble_
 import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumble_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/bloc/solve_list_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_state.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../../../../configurations/models/configurations.dart';
 
 class CubeTimerBloc extends Cubit<CubeTimerState> {
+  final Configurations _configurations;
+  final ScrumbleCubit scrumbleCubit;
+  final SolveListCubit solveListCubit;
   final int _awaitHoldinTime = 1000;
   int _time = 0;
-  final inspectTime;
-  int _countDownTime;
+  final int _inspectTime;
+  int _inspectionTime;
   int _holdingTime = 0;
   String _scrumble = "";
   bool _plusTwo = false;
@@ -27,10 +30,15 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   TimerState _timerState = TimerState.initial;
 
   DateTime initialTime = DateTime.now();
-  DateTime countDownTime = DateTime.now();
+  DateTime initialInspectionDateTime = DateTime.now();
 
-  CubeTimerBloc({required this.inspectTime})
-      : _countDownTime = inspectTime,
+  CubeTimerBloc(
+      {required Configurations configurations,
+      required this.solveListCubit,
+      required this.scrumbleCubit})
+      : _configurations = configurations,
+        _inspectTime = configurations.timeInspect.value,
+        _inspectionTime = configurations.timeInspect.value,
         super(InitialCubeTimerState()) {
     _loadTimer();
   }
@@ -39,23 +47,27 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     ScrumbleGenerator scrumbleGenerator = ScrumbleGeneratorImpl();
     _scrumble = scrumbleGenerator.selectScrumbeForCubeType(CubeType.cube3x3x3);
     emit(LoadedCubeTimerState(
-        time: _time,
-        timeCountDown: _countDownTime,
-        timerState: _timerState,
-        pressed: _pressed,
-        dnf: _dnf,
-        plusTwo: _plusTwo,
-        scrumble: _scrumble));
+      time: _time,
+      timeCountDown: _inspectionTime,
+      timerState: _timerState,
+      pressed: _pressed,
+      dnf: _dnf,
+      plusTwo: _plusTwo,
+      scrumble: _scrumble,
+    ));
   }
 
   void prepareToGo() {
-    resetCronometer();
+    if (!_configurations.pressToRun) {
+      return;
+    }
+
     _timerState = TimerState.preparing;
 
     _updateHoldingTime();
     emit(LoadedCubeTimerState(
         time: _time,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         timerState: _timerState,
         pressed: _pressed,
         dnf: _dnf,
@@ -63,44 +75,44 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         scrumble: _scrumble));
   }
 
-  void startCountDown(BuildContext context) {
+  void startInpection() {
     _timerState = TimerState.inspecting;
-    _countDownTime = inspectTime;
-    countDownTime = DateTime.now();
+    initialInspectionDateTime = DateTime.now();
 
     emit(LoadedCubeTimerState(
         time: _time,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         timerState: _timerState,
         pressed: _pressed,
         dnf: _dnf,
         plusTwo: _plusTwo,
         scrumble: _scrumble));
-    _updateCountDown(context);
+
+    _updateInspectionTime();
   }
 
-  Future<void> _updateCountDown(BuildContext context) async {
+  Future<void> _updateInspectionTime() async {
     if (_timerState == TimerState.plusTwo) {
       _dnf = true;
       _timerState = TimerState.dnf;
       emit(LoadedCubeTimerState(
           time: _time,
-          timeCountDown: _countDownTime,
+          timeCountDown: _inspectionTime,
           timerState: _timerState,
           pressed: _pressed,
           dnf: _dnf,
           plusTwo: _plusTwo,
           scrumble: _scrumble));
 
-      stopTimer(context);
-    } else if (_countDownTime == 0) {
+      stopTimer();
+    } else if (_inspectionTime == 0) {
       _plusTwo = true;
-      _countDownTime = 15;
+      _inspectionTime = 15;
       _timerState = TimerState.plusTwo;
 
       emit(LoadedCubeTimerState(
           time: _time,
-          timeCountDown: _countDownTime,
+          timeCountDown: _inspectionTime,
           timerState: _timerState,
           pressed: _pressed,
           dnf: _dnf,
@@ -108,22 +120,22 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           scrumble: _scrumble));
 
       await Future.delayed(const Duration(seconds: 2));
-      _updateCountDown(context);
-    } else if (_timerState == TimerState.inspecting && _countDownTime > 0) {
+      _updateInspectionTime();
+    } else if (_timerState == TimerState.inspecting && _inspectionTime > 0) {
       await Future.delayed(const Duration(milliseconds: 1000));
 
-      _countDownTime -= 1;
+      _inspectionTime -= 1;
 
       emit(LoadedCubeTimerState(
           time: _time,
-          timeCountDown: _countDownTime,
+          timeCountDown: _inspectionTime,
           timerState: _timerState,
           pressed: _pressed,
           dnf: _dnf,
           plusTwo: _plusTwo,
           scrumble: _scrumble));
 
-      _updateCountDown(context);
+      _updateInspectionTime();
     }
   }
 
@@ -135,23 +147,33 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         dnf: _dnf,
         plusTwo: _plusTwo,
         pressed: _pressed,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         scrumble: _scrumble));
   }
 
-  void resetCronometer() {
+  void verifyPressedTimeCanGo() {
+    if (_timerState == TimerState.ready) {
+      startTimer();
+      return;
+    }
+
+    _resetCronometer();
+  }
+
+  void _resetCronometer() {
     _timerState = _dnf ? TimerState.dnf : TimerState.initial;
     _time = 0;
     _holdingTime = 0;
-    _countDownTime = inspectTime;
+    _inspectionTime = _inspectTime;
     _dnf = false;
     _plusTwo = false;
+
     emit(LoadedCubeTimerState(
         dnf: _dnf,
         plusTwo: _plusTwo,
         time: _time,
         timerState: _timerState,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         pressed: _pressed,
         scrumble: _scrumble));
   }
@@ -171,19 +193,34 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   }
 
   void startTimer() {
+    if (_configurations.pressToRun && _timerState == TimerState.initial) {
+      return;
+    }
+
+    if (_timerState == TimerState.running ||
+        _timerState == TimerState.preparing) {
+      return;
+    }
+
+    if (_configurations.inspect &&
+        (_timerState == TimerState.initial ||
+            _timerState == TimerState.dnf ||
+            _timerState == TimerState.ready)) {
+      startInpection();
+      return;
+    }
+
     _timerState = TimerState.running;
-    _time = 0;
-    // _countDownTime = 15;
-    initialTime = DateTime.now();
+    WakelockPlus.enable();
     emit(LoadedCubeTimerState(
         time: _time,
         dnf: _dnf,
         plusTwo: _plusTwo,
         timerState: _timerState,
         pressed: _pressed,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         scrumble: _scrumble));
-    updateTimer();
+    _updateTimer();
   }
 
   void setPressed(bool pressed) {
@@ -194,11 +231,11 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         plusTwo: _plusTwo,
         timerState: _timerState,
         pressed: _pressed,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         scrumble: _scrumble));
   }
 
-  Future<void> updateTimer() async {
+  Future<void> _updateTimer() async {
     if (_timerState == TimerState.running) {
       await Future.delayed(const Duration(milliseconds: 10));
       DateTime nowTime = DateTime.now();
@@ -209,24 +246,17 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           dnf: _dnf,
           plusTwo: _plusTwo,
           timerState: _timerState,
-          timeCountDown: _countDownTime,
+          timeCountDown: _inspectionTime,
           pressed: _pressed,
           scrumble: _scrumble));
-      updateTimer();
+      _updateTimer();
     }
   }
 
-  void stopTimer(BuildContext context) {
-    SolveListCubit solveListCubit =
-        BlocProvider.of<SolveListCubit>(context, listen: false);
-    ScrumbleCubit scrumbleCubit = BlocProvider.of<ScrumbleCubit>(context);
-
-    ConfigurationsBloc configurationsCubit =
-        BlocProvider.of<ConfigurationsBloc>(context);
-
+  void stopTimer() {
     emit(LoadedCubeTimerState(
         time: _time,
-        timeCountDown: _countDownTime,
+        timeCountDown: _inspectionTime,
         dnf: _dnf,
         plusTwo: _plusTwo,
         timerState: _timerState,
@@ -239,12 +269,13 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         time: _time,
         solveDate: DateTime.now(),
         scramble: scrumbleCubit.scrumble,
-        cubeTag: configurationsCubit.configurations.cubeTag,
-        cubeType: configurationsCubit.configurations.cubeType,
+        cubeTag: _configurations.cubeTag,
+        cubeType: _configurations.cubeType,
         dnf: _dnf,
         plusTwo: _plusTwo));
 
-    resetCronometer();
+    _resetCronometer();
     scrumbleCubit.resetScramble();
+    WakelockPlus.disable();
   }
 }

@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SolveListCubit extends Cubit<SolveListState> {
   final SolveDao _solveDao = SolveDao();
   final List<Solve> _solves = [];
+  double _ao5 = 0;
+  double _ao12 = 0;
 
   SolveListCubit() : super(InitialSolveListState());
 
@@ -18,8 +20,57 @@ class SolveListCubit extends Cubit<SolveListState> {
 
     _solves.clear();
     _solves.addAll(solvesFromDb);
+    _loadStats();
+    emit(LoadedSolveListState(solves: _solves, ao12: _ao12, ao5: _ao5));
+  }
 
-    emit(LoadedSolveListState(solves: _solves));
+  void _loadStats() {
+    _ao12 = getAo12();
+    _ao5 = getAo5();
+  }
+
+  double getAo5() {
+    double ao5 = 0;
+    if (_solves.length < 5) {
+      return ao5;
+    }
+
+    var md5List = _solves.getRange(_solves.length - 5, _solves.length - 1);
+
+    for (Solve solve in md5List) {
+      if (solve.dnf) {
+        ao5 = -1;
+        return ao5;
+      }
+
+      ao5 += solve.time;
+    }
+
+    ao5 = ao5 / md5List.length;
+
+    return ao5;
+  }
+
+  double getAo12() {
+    double ao12 = 0;
+    if (_solves.length < 12) {
+      return ao12;
+    }
+
+    var md5List = _solves.getRange(_solves.length - 12, _solves.length - 1);
+
+    for (Solve solve in md5List) {
+      if (solve.dnf) {
+        ao12 = -1;
+        return ao12;
+      }
+
+      ao12 += solve.time;
+    }
+
+    ao12 = ao12 / md5List.length;
+
+    return ao12;
   }
 
   Future<void> addNewSolve(Solve solve) async {
@@ -30,7 +81,8 @@ class SolveListCubit extends Cubit<SolveListState> {
     if (newId != 0) {
       solve.id = newId;
       _solves.add(solve);
-      emit(LoadedSolveListState(solves: _solves));
+      _loadStats();
+      emit(LoadedSolveListState(solves: _solves, ao12: _ao12, ao5: _ao5));
     } else {
       emit(ErrorSolveListState(error: "Unknown"));
     }
@@ -46,7 +98,8 @@ class SolveListCubit extends Cubit<SolveListState> {
       _solves.remove(getSolve);
       _solves.insert(index, solve);
 
-      emit(LoadedSolveListState(solves: _solves));
+      _loadStats();
+      emit(LoadedSolveListState(solves: _solves, ao12: _ao12, ao5: _ao5));
     } else {
       emit(ErrorSolveListState(error: "Unknown"));
     }
@@ -57,7 +110,8 @@ class SolveListCubit extends Cubit<SolveListState> {
 
     if (removedLines > 0) {
       _solves.remove(solve);
-      emit(LoadedSolveListState(solves: _solves));
+      _loadStats();
+      emit(LoadedSolveListState(solves: _solves, ao12: _ao12, ao5: _ao5));
     } else {
       emit(ErrorSolveListState(error: "Unknown"));
     }

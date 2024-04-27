@@ -12,6 +12,7 @@ class LoadedCubeTimerState extends CubeTimerState {
   bool pressed;
   bool plusTwo;
   bool dnf;
+
   TimerState timerState;
   final String scrumble;
 
