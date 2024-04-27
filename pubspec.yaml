@@ -34,7 +34,7 @@ dependencies:
   bloc: ^8.1.4
   flutter_bloc: ^8.1.5
   sqflite: ^2.3.3
-  wakelock_plus: ^1.2.4
+  wakelock: ^0.6.2
   flutter_launcher_icons: ^0.13.1
 
 

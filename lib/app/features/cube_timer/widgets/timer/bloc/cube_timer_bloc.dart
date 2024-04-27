@@ -9,8 +9,7 @@ import 'package:crono_cube/app/features/cube_timer/widgets/scrumble/bloc/scrumbl
 import 'package:crono_cube/app/features/cube_timer/widgets/solve_list/bloc/solve_list_cubit.dart';
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
-
+import 'package:wakelock/wakelock.dart';
 import '../../../../configurations/models/configurations.dart';
 
 class CubeTimerBloc extends Cubit<CubeTimerState> {
@@ -211,7 +210,7 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     }
 
     _timerState = TimerState.running;
-    WakelockPlus.enable();
+    Wakelock.enable();
     emit(LoadedCubeTimerState(
         time: _time,
         dnf: _dnf,
@@ -276,6 +275,6 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
 
     _resetCronometer();
     scrumbleCubit.resetScramble();
-    WakelockPlus.disable();
+    Wakelock.disable();
   }
 }
