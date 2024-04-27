@@ -211,6 +211,7 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
 
     _timerState = TimerState.running;
     Wakelock.enable();
+    initialTime = DateTime.now();
     emit(LoadedCubeTimerState(
         time: _time,
         dnf: _dnf,
