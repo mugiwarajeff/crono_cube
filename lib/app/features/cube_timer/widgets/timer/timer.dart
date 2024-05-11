@@ -36,8 +36,8 @@ class Timer extends StatelessWidget {
     final ConfigurationsBloc configurationsBloc = BlocProvider.of(context);
 
     const double timerTextSize = 80;
-
     const double averageTextSize = 16;
+    const double averageLandscapeTextSize = 22;
 
     final CubeTimerBloc cubeTimerBloc = CubeTimerBloc(
         configurations: configurationsBloc.configurations,
@@ -83,12 +83,18 @@ class Timer extends StatelessWidget {
                                 children: [
                                   Text(
                                       "ao5: ${state.ao5 == 0 ? "--" : state.ao5 == -1 ? "DNF" : (state.ao5 / 1000).toStringAsFixed(2)}",
-                                      style: const TextStyle(
-                                          fontSize: averageTextSize)),
+                                      style: TextStyle(
+                                          fontSize: orientation ==
+                                                  Orientation.landscape
+                                              ? averageLandscapeTextSize
+                                              : averageTextSize)),
                                   Text(
                                       "ao12: ${state.ao12 == 0 ? "--" : state.ao12 == -1 ? "DNF" : (state.ao12 / 1000).toStringAsFixed(2)}",
-                                      style: const TextStyle(
-                                          fontSize: averageTextSize))
+                                      style: TextStyle(
+                                          fontSize: orientation ==
+                                                  Orientation.landscape
+                                              ? averageLandscapeTextSize
+                                              : averageTextSize))
                                 ],
                               ),
                             ],

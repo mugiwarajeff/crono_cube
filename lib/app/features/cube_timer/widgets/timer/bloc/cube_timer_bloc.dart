@@ -57,6 +57,14 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   }
 
   void prepareToGo() {
+    if (_timerState == TimerState.running) {
+      return;
+    }
+
+    if (_timerState == TimerState.inspecting) {
+      return;
+    }
+
     if (!_configurations.pressToRun) {
       return;
     }
@@ -153,6 +161,10 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   void verifyPressedTimeCanGo() {
     if (_timerState == TimerState.ready) {
       startTimer();
+      return;
+    }
+
+    if (_timerState == TimerState.inspecting) {
       return;
     }
 

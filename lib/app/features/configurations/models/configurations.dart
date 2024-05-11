@@ -1,8 +1,10 @@
 import 'package:crono_cube/app/features/configurations/models/value_object/time_inspect.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
+import 'package:equatable/equatable.dart';
 
-class Configurations {
+// ignore: must_be_immutable
+class Configurations extends Equatable {
   bool darkTheme;
   bool inspect;
   bool pressToRun;
@@ -51,4 +53,8 @@ class Configurations {
         inspect = false,
         pressToRun = false,
         timeInspect = TimeInspect(value: 15);
+
+  @override
+  List<Object?> get props =>
+      [darkTheme, inspect, pressToRun, timeInspect.value, cubeTag, cubeType];
 }
