@@ -7,26 +7,31 @@ import 'package:crono_cube/app/features/statistics/bloc/statistics_cubit.dart';
 import 'package:crono_cube/database/daos/configurations_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  final SolveListCubit solveListCubit = SolveListCubit();
-  final ConfigurationsDao configurationsDao = ConfigurationsDao();
-
   runApp(MultiBlocProvider(providers: [
-    BlocProvider(
+    Provider(create: (context) => SolveListCubit()),
+    Provider(create: (context) => ConfigurationsDao()),
+    ProxyProvider<ConfigurationsDao, ConfigurationsBloc>(
+      update: (context, configurationsDao, previous) =>
+          ConfigurationsBloc(configurationsDao: configurationsDao),
+    ),
+    ProxyProvider<ConfigurationsDao, ConfigurationsBloc>(
       lazy: false,
-      create: (context) =>
+      update: (context, configurationsDao, previous) =>
           ConfigurationsBloc(configurationsDao: configurationsDao),
     ),
     BlocProvider(
       create: (context) =>
           ScrumbleCubit(scrumbleGenerator: ScrumbleGeneratorImpl()),
     ),
-    BlocProvider(
-      create: (context) => solveListCubit,
+    Provider(
+      create: (context) => SolveListCubit(),
     ),
-    BlocProvider(
-      create: (context) => StatisticsCubit(solveListCubit: solveListCubit),
-    ),
+    ProxyProvider<SolveListCubit, StatisticsCubit>(
+      update: (context, solveListCubit, previous) =>
+          StatisticsCubit(solveListCubit: solveListCubit),
+    )
   ], child: const App()));
 }
