@@ -1,14 +1,36 @@
 import 'package:crono_cube/app/features/configurations/bloc/configurations_bloc.dart';
 import 'package:crono_cube/app/features/configurations/configurations_dialog.dart';
 import 'package:crono_cube/app/features/cube_timer/cube_timer.dart';
+import 'package:crono_cube/app/features/statistics/statistics_page.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  int _index = 0;
+
+  Widget _selectPage() {
+    switch (_index) {
+      case 0:
+        return const CubeTimer();
+      case 1:
+        return const StatisticsPage();
+      default:
+        return Container();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Color primaryColor = Theme.of(context).colorScheme.primary;
+    final Color onPrimaryColor = Theme.of(context).colorScheme.surface;
     const String homeTitle = "Crono Cube";
 
     void showConfigurationsDialog() {
@@ -33,7 +55,21 @@ class HomeView extends StatelessWidget {
               icon: const Icon(Icons.settings))
         ],
       ),
-      body: const CubeTimer(),
+      body: _selectPage(),
+      bottomNavigationBar: CurvedNavigationBar(
+          items: const [
+            Icon(Icons.timer),
+            Icon(Icons.bar_chart_rounded),
+          ],
+          height: 60,
+          backgroundColor: onPrimaryColor,
+          color: primaryColor,
+          buttonBackgroundColor: onPrimaryColor,
+          index: _index,
+          onTap: (newIndex) {
+            _index = newIndex;
+            setState(() {});
+          }),
     );
   }
 }

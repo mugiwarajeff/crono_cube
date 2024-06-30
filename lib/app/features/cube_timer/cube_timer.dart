@@ -55,7 +55,7 @@ class CubeTimer extends StatelessWidget {
             Visibility(
               visible: orientation == Orientation.portrait,
               child: Flexible(
-                flex: 4,
+                flex: 3,
                 child: BlocBuilder<ConfigurationsBloc, ConfigurationsState>(
                   builder: (context, state) {
                     if (state is LoadedConfigurationsState) {

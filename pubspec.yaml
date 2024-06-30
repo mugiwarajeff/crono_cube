@@ -37,6 +37,7 @@ dependencies:
   wakelock: ^0.6.2
   flutter_launcher_icons: ^0.13.1
   equatable: ^2.0.5
+  curved_navigation_bar: ^1.0.6
 
 
   # The following adds the Cupertino Icons font to your application.
