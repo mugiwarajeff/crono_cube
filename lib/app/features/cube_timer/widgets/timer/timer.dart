@@ -1,4 +1,5 @@
 import 'package:crono_cube/app/features/configurations/bloc/configurations_bloc.dart';
+import 'package:crono_cube/app/features/configurations/utils/utils.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_tag.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/cube_type.dart';
 import 'package:crono_cube/app/features/cube_timer/enum/timer_states.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class Timer extends StatelessWidget {
   final Orientation orientation;
@@ -33,7 +35,7 @@ class Timer extends StatelessWidget {
     final SolveListCubit solveListCubit =
         BlocProvider.of<SolveListCubit>(context);
     final ScrumbleCubit scrumbleCubit = BlocProvider.of<ScrumbleCubit>(context);
-    final ConfigurationsBloc configurationsBloc = BlocProvider.of(context);
+    final ConfigurationsBloc configurationsBloc = Provider.of(context);
 
     const double timerTextSize = 80;
     const double averageTextSize = 16;
@@ -46,7 +48,24 @@ class Timer extends StatelessWidget {
 
     return BlocConsumer<CubeTimerBloc, CubeTimerState>(
       listener: (context, state) {
-        if (state is LoadedCubeTimerState) {}
+        if (state is RecordSolveState) {
+          final Color mainColor = Theme.of(context).colorScheme.secondary;
+          final String recordText =
+              "Novo record para o ${ConfigurationsUtils.translateCubeType(configurationsBloc.configurations.cubeType)}";
+
+          const int messageDuration = 2;
+
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(recordText),
+            duration: const Duration(seconds: messageDuration),
+            backgroundColor: mainColor,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30))),
+            elevation: 100,
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.horizontal,
+          ));
+        }
       },
       bloc: cubeTimerBloc,
       builder: (context, state) {
@@ -55,6 +74,7 @@ class Timer extends StatelessWidget {
         } else if (state is LoadingCubeTimerState) {
           return Container();
         } else if (state is LoadedCubeTimerState) {
+          print(state.time);
           return Stack(
             children: [
               Align(
@@ -71,8 +91,10 @@ class Timer extends StatelessWidget {
                                   : utils.formatCronometerText(state.time),
                       style: TextStyle(
                           fontSize: timerTextSize,
-                          color:
-                              utils.selectTextColor(state.timerState, context)),
+                          color: state.wasRecord
+                              ? Colors.green
+                              : utils.selectTextColor(
+                                  state.timerState, context)),
                     ),
                     BlocBuilder<StatisticsCubit, StatisticsState>(
                       builder: (context, state) {

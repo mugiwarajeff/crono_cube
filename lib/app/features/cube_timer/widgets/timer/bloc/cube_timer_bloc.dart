@@ -24,6 +24,7 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   String _scrumble = "";
   bool _plusTwo = false;
   bool _dnf = false;
+  bool _wasRecord = false;
 
   bool _pressed = false;
   TimerState _timerState = TimerState.initial;
@@ -46,14 +47,14 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
     ScrumbleGenerator scrumbleGenerator = ScrumbleGeneratorImpl();
     _scrumble = scrumbleGenerator.selectScrumbeForCubeType(CubeType.cube3x3x3);
     emit(LoadedCubeTimerState(
-      time: _time,
-      timeCountDown: _inspectionTime,
-      timerState: _timerState,
-      pressed: _pressed,
-      dnf: _dnf,
-      plusTwo: _plusTwo,
-      scrumble: _scrumble,
-    ));
+        time: _time,
+        timeCountDown: _inspectionTime,
+        timerState: _timerState,
+        pressed: _pressed,
+        dnf: _dnf,
+        plusTwo: _plusTwo,
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
   }
 
   void prepareToGo() {
@@ -79,7 +80,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         pressed: _pressed,
         dnf: _dnf,
         plusTwo: _plusTwo,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
   }
 
   void startInpection() {
@@ -93,7 +95,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         pressed: _pressed,
         dnf: _dnf,
         plusTwo: _plusTwo,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
 
     _updateInspectionTime();
   }
@@ -109,7 +112,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           pressed: _pressed,
           dnf: _dnf,
           plusTwo: _plusTwo,
-          scrumble: _scrumble));
+          scrumble: _scrumble,
+          wasRecord: _wasRecord));
 
       stopTimer();
     } else if (_inspectionTime == 0) {
@@ -124,7 +128,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           pressed: _pressed,
           dnf: _dnf,
           plusTwo: _plusTwo,
-          scrumble: _scrumble));
+          scrumble: _scrumble,
+          wasRecord: _wasRecord));
 
       await Future.delayed(const Duration(seconds: 2));
       _updateInspectionTime();
@@ -140,7 +145,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           pressed: _pressed,
           dnf: _dnf,
           plusTwo: _plusTwo,
-          scrumble: _scrumble));
+          scrumble: _scrumble,
+          wasRecord: _wasRecord));
 
       _updateInspectionTime();
     }
@@ -155,7 +161,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         plusTwo: _plusTwo,
         pressed: _pressed,
         timeCountDown: _inspectionTime,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
   }
 
   void verifyPressedTimeCanGo() {
@@ -186,7 +193,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         timerState: _timerState,
         timeCountDown: _inspectionTime,
         pressed: _pressed,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
   }
 
   Future<void> _updateHoldingTime() async {
@@ -204,6 +212,7 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
   }
 
   void startTimer() {
+    _wasRecord = false;
     if (_configurations.pressToRun && _timerState == TimerState.initial) {
       return;
     }
@@ -231,7 +240,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         timerState: _timerState,
         pressed: _pressed,
         timeCountDown: _inspectionTime,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
     _updateTimer();
   }
 
@@ -244,7 +254,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         timerState: _timerState,
         pressed: _pressed,
         timeCountDown: _inspectionTime,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
   }
 
   Future<void> _updateTimer() async {
@@ -260,7 +271,8 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
           timerState: _timerState,
           timeCountDown: _inspectionTime,
           pressed: _pressed,
-          scrumble: _scrumble));
+          scrumble: _scrumble,
+          wasRecord: _wasRecord));
       _updateTimer();
     }
   }
@@ -273,9 +285,10 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         plusTwo: _plusTwo,
         timerState: _timerState,
         pressed: _pressed,
-        scrumble: _scrumble));
+        scrumble: _scrumble,
+        wasRecord: _wasRecord));
 
-    solveListCubit.addNewSolve(Solve(
+    Solve newSolve = Solve(
         id: 0,
         comment: "",
         time: _time,
@@ -284,10 +297,33 @@ class CubeTimerBloc extends Cubit<CubeTimerState> {
         cubeTag: _configurations.cubeTag,
         cubeType: _configurations.cubeType,
         dnf: _dnf,
-        plusTwo: _plusTwo));
+        plusTwo: _plusTwo);
+
+    _verifyRecord(newSolve);
+    print(" da solve");
+    print(newSolve.time);
+
+    solveListCubit.addNewSolve(newSolve);
 
     _resetCronometer();
     scrumbleCubit.resetScramble();
     Wakelock.disable();
+  }
+
+  void _verifyRecord(Solve newSolve) {
+    if (solveListCubit.solves.isEmpty) {
+      _wasRecord = true;
+      emit(RecordSolveState());
+      return;
+    }
+
+    for (Solve solve in solveListCubit.solves) {
+      if (solve.time < newSolve.time) {
+        return;
+      }
+    }
+
+    _wasRecord = true;
+    emit(RecordSolveState());
   }
 }

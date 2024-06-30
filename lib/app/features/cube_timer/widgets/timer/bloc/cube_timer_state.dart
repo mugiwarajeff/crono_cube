@@ -12,6 +12,7 @@ class LoadedCubeTimerState extends CubeTimerState {
   bool pressed;
   bool plusTwo;
   bool dnf;
+  bool wasRecord;
 
   TimerState timerState;
   final String scrumble;
@@ -23,8 +24,11 @@ class LoadedCubeTimerState extends CubeTimerState {
       required this.pressed,
       required this.plusTwo,
       required this.dnf,
-      required this.scrumble});
+      required this.scrumble,
+      required this.wasRecord});
 }
+
+class RecordSolveState extends CubeTimerState {}
 
 class ErrorCubeTimerState extends CubeTimerState {
   String error;

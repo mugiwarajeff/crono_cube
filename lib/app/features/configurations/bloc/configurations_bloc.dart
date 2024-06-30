@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ConfigurationsBloc extends Cubit<ConfigurationsState> {
   final ConfigurationsDao _configurationsDao;
-  late Configurations _configurations;
+  Configurations _configurations = Configurations.empty();
 
   Configurations get configurations => _configurations;
 
