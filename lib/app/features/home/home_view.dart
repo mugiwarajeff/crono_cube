@@ -30,6 +30,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Theme.of(context).colorScheme.primary;
+    final Color secondaryColor = Theme.of(context).colorScheme.onSecondary;
     final Color onPrimaryColor = Theme.of(context).colorScheme.surface;
     const String homeTitle = "Crono Cube";
 
@@ -57,9 +58,15 @@ class _HomeViewState extends State<HomeView> {
       ),
       body: _selectPage(),
       bottomNavigationBar: CurvedNavigationBar(
-          items: const [
-            Icon(Icons.timer),
-            Icon(Icons.bar_chart_rounded),
+          items: [
+            Icon(
+              Icons.timer,
+              color: _index == 0 ? primaryColor : secondaryColor,
+            ),
+            Icon(
+              Icons.bar_chart_rounded,
+              color: _index == 1 ? primaryColor : secondaryColor,
+            ),
           ],
           height: 60,
           backgroundColor: onPrimaryColor,

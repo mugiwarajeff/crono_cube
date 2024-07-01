@@ -12,9 +12,8 @@ import 'package:crono_cube/app/features/cube_timer/widgets/timer/bloc/cube_timer
 import 'package:crono_cube/app/features/cube_timer/widgets/timer/widgets/press_buttons.dart';
 import 'package:crono_cube/app/features/statistics/bloc/statistics_cubit.dart';
 import 'package:crono_cube/app/features/statistics/bloc/statistics_state.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
